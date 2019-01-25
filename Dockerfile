@@ -2,13 +2,19 @@ FROM openjdk:8-jre-slim
 
 MAINTAINER zocker-160
 
+ENV VERSION 3.0.8
+ENV DOWNLOAD_URL https://minecraft.curseforge.com/projects/sevtech-ages/files/2570735/download
+
+
 RUN apt-get update \
 	&& apt-get install -y wget unzip
+
+RUN mkdir -p /minecraft/backups
 
 # Setting workdir
 WORKDIR /minecraft
 
-RUN wget -O SevTechAgesServer.zip --no-check-certificate https://minecraft.curseforge.com/projects/sevtech-ages/files/2570735/download \
+RUN wget -O SevTechAgesServer.zip --no-check-certificate "$DOWNLOAD_URL" \
 	&& unzip SevTechAgesServer.zip \
 	&& rm SevTechAgesServer.zip
 
@@ -25,7 +31,10 @@ RUN /minecraft/Install.sh
 EXPOSE 25565
 
 # Expose volume
-VOLUME ["/minecraft"]
+VOLUME /minecraft/config \
+	/minecraft/logs \
+	/minecraft/backups \
+	/minecraft/world
 
 # Start server
 CMD /minecraft/ServerStart.sh
